@@ -1,7 +1,7 @@
 {
   "name": "kicker",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Discord bot which kicks all members without specific roles to renew your server.",
   "main": "index.js",
   "scripts": {
     "test": "ts-node src/main.ts",
