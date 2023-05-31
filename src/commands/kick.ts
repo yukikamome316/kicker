@@ -1,10 +1,18 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { Interaction, CommandInteraction, SlashCommandBuilder } from "discord.js";
 
-module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('find')
-        .setDescription('Replies with Pong!'),
-    async execute(interaction: any) {
-        await interaction.reply('Pong!');
-    },
+export const data = new SlashCommandBuilder()
+  .setName('kickall')
+  .setDescription('Kicks a user')
+  .addRoleOption(option =>
+    option.setName('plus')
+      .setDescription('Plus role')
+  )
+  .addRoleOption(option =>
+    option.setName('minus')
+      .setDescription('Minus role')
+      .setRequired(true)
+  );
+
+export const execute = async (interaction: CommandInteraction): Promise<void> => {
+  await interaction.reply('test');
 };
