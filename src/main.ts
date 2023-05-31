@@ -1,8 +1,18 @@
 // Require the necessary discord.js classes
-import { GatewayIntentBits, Client, Partials, Message, Events } from 'discord.js'
-import dotenv from 'dotenv';
+import { GatewayIntentBits, Client, Partials, Events } from 'discord.js'
+import { z } from 'zod';
+import { config } from 'dotenv';
 
-dotenv.config();
+const envSchema = z.object({
+  BOT_TOKEN: z.string(),
+  BOT_ID: z.string(),
+});
+
+config();
+
+export type Env = z.infer<typeof envSchema>
+
+const env = envSchema.parse(process.env);
 
 // Create a new client instance
 const client = new Client({
@@ -24,4 +34,4 @@ client.once(Events.ClientReady, c => {
 });
 
 // Log in to Discord with your client's token
-client.login(process.env.BOT_TOKEN);
+client.login(env.BOT_TOKEN);
