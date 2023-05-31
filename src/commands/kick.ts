@@ -1,18 +1,9 @@
 import { Interaction, CommandInteraction, SlashCommandBuilder } from "discord.js";
 
 export const data = new SlashCommandBuilder()
-  .setName('kickall')
-  .setDescription('Kicks a user')
-  .addRoleOption(option =>
-    option.setName('plus')
-      .setDescription('Plus role')
-  )
-  .addRoleOption(option =>
-    option.setName('minus')
-      .setDescription('Minus role')
-      .setRequired(true)
-  );
+  .setName('ping')
+  .setDescription('test')
 
 export const execute = async (interaction: CommandInteraction): Promise<void> => {
-  await interaction.reply('test');
+  await interaction.reply({content: 'pong!', ephemeral: true});
 };

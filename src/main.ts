@@ -8,7 +8,8 @@ import {
   Collection, 
   Interaction, 
   CommandInteraction,
-  SlashCommandBuilder
+  SlashCommandBuilder,
+  GuildMemberRoleManager,
 } from 'discord.js';
 import { z } from 'zod';
 import { config } from 'dotenv';
@@ -43,7 +44,7 @@ client.once(Events.ClientReady, () => {
 const commands = new Collection<string, { data: any, execute: (interaction: CommandInteraction) => Promise<void>}>()
 commands.set(kick.data.name, {data: kick.data, execute: kick.execute});
 
-client.on(Events.InteractionCreate, async (interaction: Interaction) => {
+client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isCommand()) return;
 
   const command = commands.get(interaction.commandName);
@@ -64,7 +65,6 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
 const rest = new REST({ version: '10' }).setToken(env.BOT_TOKEN);
 const commandsList = Array.from(commands.values()).map(command => command.data.toJSON());
 
-// console.log(commandsList);
 (async () => {
   try {
     await rest.put(
