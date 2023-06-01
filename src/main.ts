@@ -17,7 +17,7 @@ import * as path from 'path';
 import { any, map, z } from 'zod';
 import { config } from 'dotenv';
 import * as ping from "./commands/ping";
-import * as kickall from "./commands/kickall";
+import * as kickall from "./commands/list";
 
 const envSchema = z.object({
   BOT_TOKEN: z.string(),
