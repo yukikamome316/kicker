@@ -10,10 +10,14 @@ import {
   CommandInteraction,
   SlashCommandBuilder,
   GuildMemberRoleManager,
+  VoiceStateEditOptions,
 } from 'discord.js';
-import { z } from 'zod';
+import * as fs from 'fs';
+import * as path from 'path';
+import { any, map, z } from 'zod';
 import { config } from 'dotenv';
-import * as kick from "./commands/ping";
+import * as ping from "./commands/ping";
+import * as kickall from "./commands/kickall";
 
 const envSchema = z.object({
   BOT_TOKEN: z.string(),
@@ -41,8 +45,19 @@ client.once(Events.ClientReady, () => {
   console.log(`Ready! Logged in as ${client.user?.tag}`);
 });
 
-const commands = new Collection<string, { data: any, execute: (interaction: CommandInteraction) => Promise<void>}>()
-commands.set(kick.data.name, {data: kick.data, execute: kick.execute});
+interface Command {
+  data: SlashCommandBuilder,
+  execute(interaction: Interaction): Promise<any>;
+}
+
+const commands = new Collection<string, Command>();
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const command = require(path.join(__dirname, 'commands', file));
+  commands.set(command.data.name, command);
+}
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isCommand()) return;
@@ -63,13 +78,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 const rest = new REST({ version: '10' }).setToken(env.BOT_TOKEN);
-const commandsList = Array.from(commands.values()).map(command => command.data.toJSON());
+const commandsJson = Array.from(commands.values()).map(command => command.data.toJSON());
 
 (async () => {
   try {
     await rest.put(
       Routes.applicationCommands(env.BOT_ID),
-      { body: commandsList },
+      { body: commandsJson },
     );
     console.log('Successfully registered slash commands.');
   } catch (error) {
