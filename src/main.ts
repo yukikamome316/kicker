@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import { z } from 'zod';
 import { config } from 'dotenv';
-import * as kick from "./commands/kick";
+import * as kick from "./commands/ping";
 
 const envSchema = z.object({
   BOT_TOKEN: z.string(),
