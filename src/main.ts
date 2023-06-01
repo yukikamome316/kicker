@@ -7,17 +7,12 @@ import {
   Routes, 
   Collection, 
   Interaction, 
-  CommandInteraction,
   SlashCommandBuilder,
-  GuildMemberRoleManager,
-  VoiceStateEditOptions,
 } from 'discord.js';
 import * as fs from 'fs';
 import * as path from 'path';
-import { any, map, z } from 'zod';
+import { z } from 'zod';
 import { config } from 'dotenv';
-import * as ping from "./commands/ping";
-import * as kickall from "./commands/list";
 
 const envSchema = z.object({
   BOT_TOKEN: z.string(),

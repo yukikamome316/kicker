@@ -1,5 +1,4 @@
 import { Role, Interaction, SlashCommandBuilder, EmbedBuilder } from "discord.js";
-import { string } from "zod";
 
 export const data = new SlashCommandBuilder()
   .setName('list')
