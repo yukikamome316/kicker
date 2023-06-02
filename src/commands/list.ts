@@ -8,7 +8,8 @@ import {
   ColorResolvable,
   PermissionFlagsBits,
   PermissionsBitField,
-  bold
+  bold,
+  GuildMember
 } from "discord.js";
 import { getRoleTextsByOptionName, getRoleMemberList, RoleMemberList } from "../utils/roles";
 
@@ -155,16 +156,19 @@ export const execute = async (interaction: Interaction) => {
 
         if (confirmation.customId === 'confirm') {
           await confirmation.update({ content: bold('Processing...'), components: [] });
+
           for (let member of memberResults.data) {
+            const memberNickname = member?.displayName;
+            console.log(`Kick ${memberNickname}`);
             await interaction.guild?.members.kick(member).catch(error => {
               if (error.code === 50013) {
-                // TODO: Error handling
-                console.log(`Missing permissions to kick ${member.nickname}`);
+                console.log(`Missing permissions to kick ${memberNickname}: ${error}`);
               } else {
                 console.error(`DiscordAPIError[${error.code}]: ${error.message}`);
               }
             });
           }
+
           await confirmation.editReply({ content: bold('Done!'), components: [] });
           
         } else if (confirmation.customId === 'cancel') {
