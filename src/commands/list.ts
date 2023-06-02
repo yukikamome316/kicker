@@ -116,7 +116,7 @@ export const execute = async (interaction: Interaction) => {
   const headCount = interaction.options.getInteger('head_count') ?? DEFAULT_HEAD_COUNT;
   
   const roleWithMemberTexts = getRoleTextsByOptionName(interaction, 'positive');
-  const roleWithoutMemberTexts = getRoleTextsByOptionName(interaction, 'positive');
+  const roleWithoutMemberTexts = getRoleTextsByOptionName(interaction, 'negative');
 
   await interaction.deferReply();
   
