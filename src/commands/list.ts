@@ -88,12 +88,7 @@ const getRoleMemberList = async (
     const membersCount = members ? members.length : 0;
     
     const getHeadMembers = (n: number) => {
-      let tmp = [];
-      for (let i = 0; i < n; i++) {
-        if (i >= members.length) break;
-        tmp.push(members.at(i)?.displayName);
-      }
-      return tmp.join(', ');
+      return members.map(member => member.displayName).slice(0, n).join(', ');
     };
 
     return {
