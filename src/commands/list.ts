@@ -22,7 +22,7 @@ export const data = new SlashCommandBuilder()
       .setMinValue(1));
 
 interface RoleMemberList {
-  count: Number,
+  count: number,
   head: string,
   positive: string,
   negative: string,
