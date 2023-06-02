@@ -1,6 +1,5 @@
-import { Events, Role, Interaction, SlashCommandBuilder, EmbedBuilder, Collection, GuildMember, GuildMemberManager, GuildMemberRoleManager } from "discord.js";
+import { Role, Interaction, SlashCommandBuilder, EmbedBuilder, GuildMember } from "discord.js";
 import { client } from '../main';
-import { CommandInteraction } from "discord.js";
 import { ChatInputCommandInteraction } from "discord.js";
 
 const DEFAULT_HEAD_COUNT = 10;
