@@ -29,35 +29,35 @@ interface RoleMemberList {
   negative: string,
 }
 
+const getRoleByMention = (interaction: ChatInputCommandInteraction, mention: string): Role | null => {
+  if (!mention) return null;
+
+  const match = mention.match(/^<@&(\d+)>$/);
+  if (match) {
+    const roleId = match[1];
+    const role = interaction.guild?.roles.cache.get(roleId);
+    if (role instanceof Role) {
+      return role;
+    }
+  }
+  return null;
+};
+
 const getRoleMemberList = async (
-  interaction: CommandInteraction,
+  interaction: ChatInputCommandInteraction,
   headCount: number,
   roleWithMemberTexts: string[],
   roleWithoutMemberTexts: string[]): Promise<RoleMemberList | null> => {
     let rolesWithMember: Role[] = [];
     let rolesWithoutMember: Role[] = [];
-
-    const getRoleByMention = (mention: string): Role | null => {
-      if (!mention) return null;
-
-      const match = mention.match(/^<@&(\d+)>$/);
-      if (match) {
-        const roleId = match[1];
-        const role = interaction.guild?.roles.cache.get(roleId);
-        if (role instanceof Role) {
-          return role;
-        }
-      }
-      return null;
-    };
-
+    
     roleWithMemberTexts.forEach(text => {
-      const role = getRoleByMention(text);
+      const role = getRoleByMention(interaction, text);
       if (role)
         rolesWithMember.push(role);
     });
     roleWithoutMemberTexts.forEach(text => {
-      const role = getRoleByMention(text);
+      const role = getRoleByMention(interaction, text);
       if (role)
         rolesWithoutMember.push(role);
     });
@@ -79,7 +79,6 @@ const getRoleMemberList = async (
     const members = allMembers.filter(member => {
       const hasAllRoles = rolesWithMember.every(role => member.roles.cache.has(role.id));
       const hasNoRoles = rolesWithoutMember.every(role => !member.roles.cache.has(role.id));
-    
       return hasAllRoles && hasNoRoles;
     });
 
@@ -100,20 +99,24 @@ const getRoleMemberList = async (
     };
   };
 
+const getRoleTextsByOptionName = (
+  interaction: ChatInputCommandInteraction, option: string): Array<string> => {
+  const roleRawText = interaction.options.getString(option) ?? 'None';
+  const roleRegex = /(<@&\w+>)/g;
 
+  const roleTexts = Array.from(
+    roleRawText.matchAll(roleRegex) ?? 'None', match => match[1]);
+    
+  return roleTexts;
+};
 
 export const execute = async (interaction: Interaction) => {
   if (!interaction.isChatInputCommand()) return;
-  
-  const roleWithMemberRawText = interaction.options.getString('positive') ?? 'None';
-  const rolesWithoutMemberRawText = interaction.options.getString('negative') ?? 'None';
-  const headCount = interaction.options.getInteger('head_count') ?? DEFAULT_HEAD_COUNT;
 
-  const roleRegex = /(<@&\w+>)/g;
-  const roleWithMemberTexts = Array.from(
-    roleWithMemberRawText.matchAll(roleRegex) ?? 'None', match => match[1]);
-  const roleWithoutMemberTexts = Array.from(
-    rolesWithoutMemberRawText.matchAll(roleRegex) ?? 'None', match => match[1]);
+  const headCount = interaction.options.getInteger('head_count') ?? DEFAULT_HEAD_COUNT;
+  
+  const roleWithMemberTexts = getRoleTextsByOptionName(interaction, 'positive');
+  const roleWithoutMemberTexts = getRoleTextsByOptionName(interaction, 'positive');
 
   await interaction.deferReply();
   
