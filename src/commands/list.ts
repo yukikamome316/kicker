@@ -5,7 +5,7 @@ const DEFAULT_HEAD_COUNT = 10;
 
 export const data = new SlashCommandBuilder()
   .setName('list')
-  .setDescription('make a list members positive/negative specific roles')
+  .setDescription('make a list members with positive/negative specific roles')
   .addStringOption(option =>
 		option.setName('positive')
 			.setDescription('Roles that members have')
