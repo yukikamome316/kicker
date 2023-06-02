@@ -78,7 +78,7 @@ const getRoleMemberList = async (
     const membersCount = members ? members.size : 0;
     
     const getHeadMembers = (n: number) => {
-      return members.map(member => member.displayName).slice(0, n).join(', ');
+      return members.map(member => '<@' + member.id + '>').slice(0, n).join(', ');
     };
 
     return {
