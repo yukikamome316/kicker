@@ -1,6 +1,7 @@
 import { Events, Role, Interaction, SlashCommandBuilder, EmbedBuilder, Collection, GuildMember, GuildMemberManager, GuildMemberRoleManager } from "discord.js";
 import { client } from '../main';
 import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 
 const DEFAULT_HEAD_COUNT = 10;
 
@@ -31,8 +32,8 @@ interface RoleMemberList {
 const getRoleMemberList = async (
   interaction: CommandInteraction,
   headCount: number,
-  rolesWithMemberText: string[],
-  rolesWithoutMemberText: string[]): Promise<RoleMemberList | null> => {
+  roleWithMemberTexts: string[],
+  roleWithoutMemberTexts: string[]): Promise<RoleMemberList | null> => {
     let rolesWithMember: Role[] = [];
     let rolesWithoutMember: Role[] = [];
 
@@ -50,12 +51,12 @@ const getRoleMemberList = async (
       return null;
     };
 
-    rolesWithMemberText.forEach(text => {
+    roleWithMemberTexts.forEach(text => {
       const role = getRoleByMention(text);
       if (role)
         rolesWithMember.push(role);
     });
-    rolesWithoutMemberText.forEach(text => {
+    roleWithoutMemberTexts.forEach(text => {
       const role = getRoleByMention(text);
       if (role)
         rolesWithoutMember.push(role);
@@ -99,38 +100,40 @@ const getRoleMemberList = async (
     };
   };
 
+
+
 export const execute = async (interaction: Interaction) => {
   if (!interaction.isChatInputCommand()) return;
-
-  const rolesWithMemberRawText = interaction.options.getString('positive') ?? 'None';
+  
+  const roleWithMemberRawText = interaction.options.getString('positive') ?? 'None';
   const rolesWithoutMemberRawText = interaction.options.getString('negative') ?? 'None';
   const headCount = interaction.options.getInteger('head_count') ?? DEFAULT_HEAD_COUNT;
 
   const roleRegex = /(<@&\w+>)/g;
-  const rolesWithMemberText = Array.from(
-    rolesWithMemberRawText.matchAll(roleRegex) ?? 'None', match => match[1]);
-  const rolesWithoutMemberText = Array.from(
+  const roleWithMemberTexts = Array.from(
+    roleWithMemberRawText.matchAll(roleRegex) ?? 'None', match => match[1]);
+  const roleWithoutMemberTexts = Array.from(
     rolesWithoutMemberRawText.matchAll(roleRegex) ?? 'None', match => match[1]);
 
   await interaction.deferReply();
   
-  const list = await getRoleMemberList(
+  const memberResults = await getRoleMemberList(
     interaction,
     headCount,
-    rolesWithMemberText,
-    rolesWithoutMemberText);
+    roleWithMemberTexts,
+    roleWithoutMemberTexts);
 
-  if (!list) return;
+  if (!memberResults) return;
 
   const headName = `Head (count=${headCount})`;
   const embedToSend = new EmbedBuilder()
   .setColor("Blue")
   .setTitle('Search result')
   .addFields(
-      { name: 'User count', value: list.count.toString()},
-      { name: headName, value: list.head},
-      { name: 'Positive', value: list.positive, inline: true},
-      { name: 'Negative', value: list.negative, inline: true},
+      { name: 'User count', value: memberResults.count.toString()},
+      { name: headName, value: memberResults.head},
+      { name: 'Positive', value: memberResults.positive, inline: true},
+      { name: 'Negative', value: memberResults.negative, inline: true},
     )
     .setTimestamp();
 
