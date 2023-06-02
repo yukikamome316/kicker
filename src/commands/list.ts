@@ -1,4 +1,4 @@
-import { Role, Interaction, SlashCommandBuilder, EmbedBuilder, GuildMember } from "discord.js";
+import { Role, Interaction, SlashCommandBuilder, EmbedBuilder, GuildMember, Collection } from "discord.js";
 import { client } from '../main';
 import { ChatInputCommandInteraction } from "discord.js";
 
@@ -61,19 +61,10 @@ const getRoleMemberList = async (
         rolesWithoutMember.push(role);
     });
 
-    const guild = await client.guilds.fetch(interaction.guild?.id ?? "");
-    const allMembers: GuildMember[] = [];
+    await interaction.guild?.members.fetch();
+    const allMembers: Collection<string, GuildMember> | undefined = interaction.guild?.members.cache;
 
-    try {
-      await guild.members.fetch();
-
-      guild.members.cache.forEach((member) => {
-        allMembers.push(member);
-      });
-    } catch (error) {
-      console.error("Failed to fetch guild members:", error);
-      return null;
-    }
+    if (!allMembers) return null;
 
     const members = allMembers.filter(member => {
       const hasAllRoles = rolesWithMember.every(role => member.roles.cache.has(role.id));
@@ -84,7 +75,7 @@ const getRoleMemberList = async (
     const rolesWithMemberString = rolesWithMember.map(role => '<@&' + role.id + '>').join(' ');
     const rolesWithoutMemberString = rolesWithoutMember.map(role => '<@&' + role.id + '>').join(' ');
     
-    const membersCount = members ? members.length : 0;
+    const membersCount = members ? members.size : 0;
     
     const getHeadMembers = (n: number) => {
       return members.map(member => member.displayName).slice(0, n).join(', ');
