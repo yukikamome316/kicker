@@ -2,14 +2,18 @@ import {
     ChatInputCommandInteraction,
     Role,
     GuildMember,
-    Collection
+    Collection,
+    roleMention,
+    userMention,
+    GuildMemberManager
 } from "discord.js";
 
-interface RoleMemberList {
+export interface RoleMemberList {
   count: number,
   head: string,
   positive: string,
   negative: string,
+  data: GuildMember[]
 }
 
 const getRoleByMention = (interaction: ChatInputCommandInteraction, mention: string): Role | null => {
@@ -50,19 +54,19 @@ export const getRoleMemberList = async (
 
     if (!allMembers) return null;
 
-    const members = allMembers.filter(member => {
+    const membersResult = allMembers.filter(member => {
       const hasAllRoles = rolesWithMember.every(role => member.roles.cache.has(role.id));
       const hasNoRoles = rolesWithoutMember.every(role => !member.roles.cache.has(role.id));
       return hasAllRoles && hasNoRoles;
     });
 
-    const rolesWithMemberString = rolesWithMember.map(role => '<@&' + role.id + '>').join(' ');
-    const rolesWithoutMemberString = rolesWithoutMember.map(role => '<@&' + role.id + '>').join(' ');
+    const rolesWithMemberString = rolesWithMember.map(role => roleMention(role.id)).join(' ');
+    const rolesWithoutMemberString = rolesWithoutMember.map(role => roleMention(role.id)).join(' ');
     
-    const membersCount = members ? members.size : 0;
+    const membersCount = membersResult ? membersResult.size : 0;
     
     const getHeadMembers = (n: number) => {
-      return members.map(member => '<@' + member.id + '>').slice(0, n).join(', ');
+      return membersResult.map(member => userMention(member.id)).slice(0, n).join(', ');
     };
 
     return {
@@ -70,6 +74,7 @@ export const getRoleMemberList = async (
       head: getHeadMembers(headCount) || 'None',
       positive: rolesWithMemberString || 'None',
       negative: rolesWithoutMemberString || 'None',
+      data: Array.from(membersResult.values()),
     };
   };
 
